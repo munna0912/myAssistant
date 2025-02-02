@@ -10,12 +10,14 @@ import whisper
 model = whisper.load_model("base")
 
 async def process_audio(audio: UploadFile) -> str:
-   # process the audio stream with the Whisper model
-    with NamedTemporaryFile(delete=False, suffix=".webm") as tmp_audio:
+
+   # process with a temp file
+    with NamedTemporaryFile(delete=False, suffix=".wav") as tmp_audio:
         tmp_audio.write(audio.file.read())
         audio_path = tmp_audio.name
     try:
-        result = whisper.transcribe(model, audio_path)
+        # generate the streaming response and return it
+        result = model.transcribe(audio_path)
         return result["text"]
     finally:
         os.unlink(audio_path)
